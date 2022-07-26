@@ -6,7 +6,7 @@
  *     http://creativecommons.org/publicdomain/zero/1.0/
  */
 
-package org.vcell.imagej.plugin;
+package org.vcell.imagej.helper;
 
 import java.awt.Component;
 import java.awt.Container;
