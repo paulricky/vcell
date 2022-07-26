@@ -24,7 +24,7 @@ import org.vcell.imagej.helper.VCellHelper.VCellModelSearchResults;
 
 import net.imagej.ImageJ;
 
-@Plugin(type = ContextCommand.class, menuPath = "Plugins>LinePlot")
+@Plugin(type = ContextCommand.class, menuPath = "Plugins>VCell>Line Plot of SimResults")
 public class LinePlot extends ContextCommand{
 
 	@Parameter

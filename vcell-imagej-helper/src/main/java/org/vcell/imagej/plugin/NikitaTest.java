@@ -24,7 +24,7 @@ import org.vcell.imagej.helper.VCellHelper.VCellModelSearchResults;
 
 import net.imagej.ImageJ;
 
-@Plugin(type = ContextCommand.class, menuPath = "Plugins>NikitaTest")
+@Plugin(type = ContextCommand.class)
 public class NikitaTest extends ContextCommand{
 
 	@Parameter

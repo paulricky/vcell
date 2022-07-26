@@ -82,7 +82,7 @@ import net.imglib2.type.numeric.real.DoubleType;
  * to make the changes show up in this project choose thisEclipse->Project->Clean...->clean.
  * </p>
   */
-@Plugin(type = ContextCommand.class, menuPath = "Plugins>VCellPluginSearch")
+@Plugin(type = ContextCommand.class)
 public class ModelSearch extends ContextCommand {
 	
 	

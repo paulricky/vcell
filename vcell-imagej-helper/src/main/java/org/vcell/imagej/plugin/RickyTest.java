@@ -47,7 +47,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 
 import net.imagej.ImageJ;
 
-@Plugin(type = ContextCommand.class, menuPath = "Plugins>RickyTest")
+@Plugin(type = ContextCommand.class)
 public class RickyTest extends ContextCommand{
 
 	@Parameter

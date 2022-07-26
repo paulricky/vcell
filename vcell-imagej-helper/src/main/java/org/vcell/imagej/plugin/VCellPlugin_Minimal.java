@@ -125,7 +125,7 @@ import net.imglib2.util.Pair;
  * to make the changes show up in this project choose thisEclipse->Project->Clean...->clean.
  * </p>
   */
-@Plugin(type = ContextCommand.class, menuPath = "Plugins>VCellPlugin_Minimal")
+@Plugin(type = ContextCommand.class)
 public class VCellPlugin_Minimal extends ContextCommand {
 	
 //	final UIService service = getContext().getService(UIService.class);
