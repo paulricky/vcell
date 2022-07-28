@@ -686,9 +686,12 @@ public class VCellPlugin extends ContextCommand {
 
 									Object[][] dataVars = new Object[ijVarInfosHolder[0].getIjVarInfo().size()][3];
 									for(int i=0;i<ijVarInfosHolder[0].getIjVarInfo().size();i++) {
+									  if(!((ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("_init") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("Size_") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("_size")  || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("_flux") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("RegionArea") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("RegionVolume") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("Unitfactor") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getVariableType()).contains("Volume_Region") || ((ijVarInfosHolder[0].getIjVarInfo().get(i).getVariableType()).contains("Membrane_Region")))) {
 										dataVars[i][0] = ijVarInfosHolder[0].getIjVarInfo().get(i).getName();
 										dataVars[i][1] = ijVarInfosHolder[0].getIjVarInfo().get(i).getDomain();
 										dataVars[i][2] = ijVarInfosHolder[0].getIjVarInfo().get(i).getVariableType();
+									  }
+										
 									}
 //									JTable jtVars = new JTable(dataVars,new String[] {"Variables"});
 									jtVars.setModel(new DefaultTableModel(dataVars,new String[] {"Variable","Domain","Type"}));

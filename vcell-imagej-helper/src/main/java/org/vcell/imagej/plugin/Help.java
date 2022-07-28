@@ -1,15 +1,19 @@
 package org.vcell.imagej.plugin;
 
-import java.awt.Image;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -39,35 +43,44 @@ public class Help extends ContextCommand{
 
   	@Parameter
 	private VCellHelper vcellHelper;
-  	
-  	@Parameter
-  	private String helpText;
-
+  	static JFrame e = new JFrame();
+  	static JEditorPane pane = new JEditorPane();
+  	String helpText = ("example text");
+  	JLabel a = new JLabel(helpText);
 	public static void main(String[] args) {
         // create the ImageJ application context with all available services
         final ImageJ ij = new ImageJ();
         ij.ui().showUI();
+        pane.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
+        pane.setText("<a href=\"https://vcell.org/\">Click for help</a>");
+	    pane.setEditable(false);
+	    pane.setVisible(true);
+	    pane.addHyperlinkListener(new HyperlinkListener() {
+	    	public void hyperlinkUpdate(HyperlinkEvent e) {
+	    		 if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+	    			 try {
+	    				 URI url = null;
+	    					try {
+	    						url = new URI("https://vcell.org");
+	    					} catch (URISyntaxException e1) {
+	    						// TODO Auto-generated catch block
+	    						e1.printStackTrace();
+	    					}
+						Desktop.getDesktop().browse(url);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+		         }
+	    	}
+	    });
 	}
 
 	@Override
 	public void run() {
-		 JOptionPane e = new JOptionPane(helpText);
-   		 Image image;
-		try {
-
-		    URL url = new URL("https://i.imgur.com/mhxoPJD.png");
-		    image = ImageIO.read(url);
-		    JLabel picLabel = new JLabel(new ImageIcon(image));
-		    e.add(picLabel,0,0);
-		} catch (Exception exp) {
-		    exp.printStackTrace();
-		} 
-		JDialog dialog = e.createDialog(e, helpText + " Help");
-		dialog.setAlwaysOnTop(true);
-		dialog.setVisible(true);
-		//e.add(editor);
- 		e.setSize(500,200);            
-	    e.setVisible(true);
-		 
+		e.setVisible(true);
+		e.setSize(new Dimension(100,100));
+		e.add(pane);
+		
 	}
 }
