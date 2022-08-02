@@ -58,8 +58,7 @@ public class GroovyScripts extends ContextCommand{
 
   	@Parameter
 	private VCellHelper vcellHelper;
-  	static  JOptionPane e = new JOptionPane();
-  	static JFrame a = new JFrame();
+  	static JFrame frame = new JFrame();
   
 	String chartText = "#@VCellHelper vh\n"
 			+ "//(See https://github.com/virtualcell/vcell/tree/master/vcell-imagej-helper/src/main/java/org/vcell/imagej/helper/VCellHelper.java)\n"
@@ -305,38 +304,8 @@ public class GroovyScripts extends ContextCommand{
         // create the ImageJ application context with all available services
         final ImageJ ij = new ImageJ();
         ij.ui().showUI();
-      
- 
-	
-		 
+      		 
      }
-  
-    /* Color color = a.getBackground();
-		JEditorPane pane = new JEditorPane();
-		pane.setBackground(color);
-		pane.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
-        pane.setText("Go to " + "<a href=\"https://vcell.org/\">vcell.org</a>" + " for help");
-	    pane.setEditable(false);
-	    pane.setVisible(true);
-	    pane.addHyperlinkListener(new HyperlinkListener() {
-	    	public void hyperlinkUpdate(HyperlinkEvent e) {
-	    		 if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-	    			 try {
-	    				 URI url = null;
-	    					try {
-	    						url = new URI("https://vcell.org");
-	    					} catch (URISyntaxException e1) {
-	    						// TODO Auto-generated catch block
-	    						e1.printStackTrace();
-	    					}
-						Desktop.getDesktop().browse(url);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-		         }
-	    	}
-	    }); */    
 
 
 	
@@ -372,16 +341,16 @@ public class GroovyScripts extends ContextCommand{
 	
 	@Override
 	public void run() {
-		a.setPreferredSize(new Dimension(300,300));
-		a.setLayout(new GridBagLayout());
+		frame.setSize(new Dimension(150,300));
+		frame.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
-		scriptButton("Chart", a, chartText, c);
-		a.setVisible(true);
+		scriptButton("Chart", frame, chartText, c);
+		frame.setVisible(true);
 		c.gridx = 0;
 		c.gridy = 1;
-		scriptButton("CombineFig", a, combineFigText, c);
+		scriptButton("CombineFig", frame, combineFigText, c);
 		
 	}
 }

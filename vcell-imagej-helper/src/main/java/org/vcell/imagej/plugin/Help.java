@@ -65,6 +65,7 @@ public class Help extends ContextCommand{
 
 	@Override
 	public void run() {
+		a.setSize(new Dimension(1500,1000));
 		a.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
