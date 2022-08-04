@@ -304,7 +304,6 @@ public class GroovyScripts extends ContextCommand{
         // create the ImageJ application context with all available services
         final ImageJ ij = new ImageJ();
         ij.ui().showUI();
-      		 
      }
 
 
@@ -341,16 +340,56 @@ public class GroovyScripts extends ContextCommand{
 	
 	@Override
 	public void run() {
-		frame.setSize(new Dimension(150,300));
+		
+		frame.setSize(new Dimension(1000,800));
 		frame.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
-		scriptButton("Chart", frame, chartText, c);
-		frame.setVisible(true);
+		Image image;
+		try {
+			double scaleFactor = 0.5;
+		    URL url = new URL("https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Groovy-logo.svg/1200px-Groovy-logo.svg.png");
+		    image = (ImageIO.read(url)).getScaledInstance((int)((ImageIO.read(url).getWidth())*scaleFactor), (int)((ImageIO.read(url).getHeight())*scaleFactor), Image.SCALE_DEFAULT);
+		    JLabel picLabel = new JLabel(new ImageIcon(image));
+		    frame.add(picLabel,c);
+		} catch (Exception exp) {
+		    exp.printStackTrace();
+		} 
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridwidth = 10;
 		c.gridx = 0;
 		c.gridy = 1;
+		JEditorPane pane1 = new JEditorPane();
+		 pane1.setBackground(frame.getBackground());
+	     pane1.setContentType("text/html");
+	     pane1.setText("<html>"+ pane1.getText() +"</html>");
+	     pane1.setText("VCell infrastructure provides a way to run macros in order to communicate with VCell. Below are available macros written in <a href=\"https://groovy-lang.org/​\">Groovy</a> scripting language. To run them,  Fiji -> Plugins -> Macros -> Startup Macros ... Choose Grovy language and copy-paste the Macros into the text area. You may need to change some lines (see comments).\n"
+	     		+ "<li> \n Macros to retrieve 2D sim results image into Fiji \n");
+	     JEditorPane pane2 = new JEditorPane();
+		 pane2.setBackground(frame.getBackground());
+	     pane2.setContentType("text/html");
+	     pane2.setText("<html>"+ pane2.getText() +"</html>");
+	     pane2.setText("Macros to ...\n"
+	     		+ "\n");
+	     JEditorPane pane3 = new JEditorPane();
+		 pane3.setBackground(frame.getBackground());
+	     pane3.setContentType("text/html");
+	     pane3.setText("<html>"+ pane3.getText() +"</html>");
+	     pane3.setText("</ul>\n"
+	     		+ "\n"
+	     		+ "Please email <a mailto:blinov@uchc.edu>Michael Blinov</a> for questions.");
+	     pane1.setEditable(false);
+	     frame.add(pane1,c);
+	     c.gridy = 2;
+		scriptButton("Chart", frame, chartText, c);
+		c.gridy = 3;
+		frame.add(pane2,c);
+		c.gridy = 4;
 		scriptButton("CombineFig", frame, combineFigText, c);
-		
+		c.gridy = 5;
+		frame.add(pane3,c);
+		frame.setVisible(true);
+		frame.setResizable(false);
 	}
 }

@@ -156,10 +156,13 @@ public class VCellPlugin extends ContextCommand {
 //	final UIService service = getContext().getService(UIService.class);
 //	System.out.println(service.getDefaultUI().getApplicationFrame().getClass().getName()+" "+(service.getDefaultUI().getApplicationFrame() instanceof Frame));
 
-		private static Frame mainApplicationFrame;
+	//@Parameter
+	//(choices={" ","Line Plot", "Model Load"}, style="listBox")	
+	
+	private static Frame mainApplicationFrame;
 		
 		public static void help(String type, JPanel panel, String helpText, GridBagConstraints constraints) {
-			final JButton button = new JButton("Help");
+			final JButton button = new JButton("?");
 			panel.add(button, constraints);			
 			/*Font font = panel.getFont();
 			StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
@@ -183,7 +186,16 @@ public class VCellPlugin extends ContextCommand {
 			JEditorPane pane = new JEditorPane();
 			pane.setBackground(color);
 			pane.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
-	        pane.setText("Go to " + "<a href=\"https://vcell.org/\">vcell.org</a>" + " for help");
+	        pane.setText("In order to run plugin:\n"
+	        		+ "\n"
+	        		+ "<ul>\n"
+	        		+ "<li> VCell (" + "<a href=\"https://vcell.org/\">http://vcell.org</a>" + ") should be started\n"
+	        				+ "\n"
+	        				+ "<li> you should be logged in under your username to load your models or unedr VCguest to load all public models.\n"
+	        				+ "\n"
+	        				+ "<li> VCell ImageJ service should be started, under Tools -> Start Fiji...\n"
+	        				+ "\n"
+	        				+ "</ul>");
 		    pane.setEditable(false);
 		    pane.setVisible(true);
 		    pane.addHyperlinkListener(new HyperlinkListener() {
@@ -296,6 +308,9 @@ public class VCellPlugin extends ContextCommand {
 
 		@Parameter
 		private UIService uiService;
+		
+		@Parameter (choices={"BioModel", "MathModel"}, style="listBox")
+	  	private String modelType;
 
 		@Parameter(required = true)
 		private VCellHelper vcellHelper;
@@ -492,6 +507,14 @@ public class VCellPlugin extends ContextCommand {
 			
 			c.gridy = 0;
 			c.gridx = 0;
+			c.gridwidth = 10;
+			JLabel topText = new JLabel("Select BioModel (bm) or MathModel (mm). VCell/Fiji service should be started");
+			//System.out.print(topText.getFont());
+			topText.setFont(new Font("Lucida Grande", Font.BOLD, 13));
+			jp.add(topText, c);
+			c.gridy = 1;
+			c.gridx = 0;
+			c.gridwidth =1;
 			jp.add(new JLabel("Model Type"),c);
 			c.gridx = 2;
 			c.gridwidth = 2;
@@ -500,8 +523,9 @@ public class VCellPlugin extends ContextCommand {
 			c.gridx = 2;
 			//help("Model Type", jp, "model help text", c);
 			
-			c.gridy = 1;
+			c.gridy = 2;
 			c.gridx = 0;
+			
 			//help("User ID", jp, "user id text", c);
 			//c.gridx = 1;
 			jp.add(new JLabel("VCell Userid"), c);
@@ -516,7 +540,7 @@ public class VCellPlugin extends ContextCommand {
 							try {
 								searchVCell();
 							} catch (Exception e1) {
-								uiService.showDialog("Error in searchVCell()\n"+e1.getClass().getName()+"\n"+e1.getMessage());
+								uiService.showDialog("PLEASE START VCELL AND CHOOSE TOOLS -> START FIJI\n");
 //								JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(jp);
 //								topFrame.dispose();
 								return;
@@ -545,7 +569,7 @@ public class VCellPlugin extends ContextCommand {
 			
 			
 					
-			c.gridy = 2;
+			c.gridy = 3;
 			c.gridx = 0;
 			//help("Model Name", jp, "model name text", c);
 			//c.gridx = 1;
@@ -573,7 +597,7 @@ public class VCellPlugin extends ContextCommand {
 				}});
 			jp.add(jcbModelNames, c);
 			
-			c.gridy = 3;
+			c.gridy = 4;
 			c.gridx = 0;
 			//help("App Name", jp, "app name text", c);
 			//c.gridx = 1;
@@ -602,7 +626,7 @@ public class VCellPlugin extends ContextCommand {
 
 			// JComboBox<String> jcbTimes = new StyledComboBox<String>();
 			//jcbTimes.setEnabled(false);
-			c.gridy = 4;
+			c.gridy = 5;
 			c.gridx = 0;
 			//help("Sim Name", jp, "sim name text", c);
 			//c.gridx = 1;
@@ -671,7 +695,7 @@ public class VCellPlugin extends ContextCommand {
 			JTable jtVars = new JTable();
 			JSlider minTimeJSlider1 = new javax.swing.JSlider();
 			JSlider maxTimeJSlider1 = new javax.swing.JSlider();
-			c.gridy = 5;
+			c.gridy = 6;
 			c.gridx = 0;
 			//help("Vars and Times", jp, "vars and times text", c);
 			//c.gridx = 1;
@@ -716,12 +740,16 @@ public class VCellPlugin extends ContextCommand {
 //								}
 
 									Object[][] dataVars = new Object[ijVarInfosHolder[0].getIjVarInfo().size()][3];
+									int counter1 = 0;
 									for(int i=0;i<ijVarInfosHolder[0].getIjVarInfo().size();i++) {
 									  if(!((ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("_init") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("Size_") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("_size")  || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("_flux") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("RegionArea") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("RegionVolume") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getName()).contains("Unitfactor") || (ijVarInfosHolder[0].getIjVarInfo().get(i).getVariableType()).contains("Volume_Region") || ((ijVarInfosHolder[0].getIjVarInfo().get(i).getVariableType()).contains("Membrane_Region")))) {
 										dataVars[i][0] = ijVarInfosHolder[0].getIjVarInfo().get(i).getName();
 										dataVars[i][1] = ijVarInfosHolder[0].getIjVarInfo().get(i).getDomain();
 										dataVars[i][2] = ijVarInfosHolder[0].getIjVarInfo().get(i).getVariableType();
-									  }
+										counter1--;
+									  } // else {
+									//	i = i-counter1;
+									 // }
 										
 									}
 //									JTable jtVars = new JTable(dataVars,new String[] {"Variables"});
@@ -818,8 +846,8 @@ public class VCellPlugin extends ContextCommand {
 			
 			jp.add(selectMultipleVarsAndTimesBtn, c);
 			
-			c.gridy = 6;
-			c.gridx = 0;
+			c.gridy = 7;
+			c.gridx = -1;
 			help("", jp, "help text", c);
 			
 			
@@ -1255,8 +1283,9 @@ public class VCellPlugin extends ContextCommand {
 				int[] time = vcellSelection.timePointIndexes;
 				
 				for(int i =0; i < time.length; i++) {
-					System.out.println(time[i]);
+				//	System.out.println(time[i]);
 				}
+				
 				
 				displayProgressBar(true, "loading Image...", "VCell Model Loader", (varIndex+1)*100/vcellSelection.varName.length,uiService);
 				final IJDataList tpd = vcellHelper.getTimePointData(vcellSelection.theCacheKey,vcellSelection.varName[varIndex],VCellHelper.VARTYPE_POSTPROC.NotPostProcess,time,0);

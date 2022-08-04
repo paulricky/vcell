@@ -54,7 +54,7 @@ public class Help extends ContextCommand{
 	private VCellHelper vcellHelper;
   	static  JOptionPane e = new JOptionPane();
 
-  	JFrame a = new JFrame();
+  	JFrame frame = new JFrame();
 	public static void main(String[] args) {
         // create the ImageJ application context with all available services
         final ImageJ ij = new ImageJ();
@@ -65,11 +65,11 @@ public class Help extends ContextCommand{
 
 	@Override
 	public void run() {
-		a.setSize(new Dimension(1500,1000));
-		a.setLayout(new GridBagLayout());
+		frame.setSize(new Dimension(1500,1000));
+		frame.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
-		String string1 =("The Start ImageJ VCell Service allows the image analysis program Fiji to communicate with VCell. Fiji can then query and transfer simulation data from VCell to Fiji. In VCell select Start Fiji (ImageJ) Service from the Tools menu");
+		String string1 = ("The Start ImageJ VCell Service allows the image analysis program Fiji to communicate with VCell. Fiji can then query and transfer simulation data from VCell to Fiji. In VCell select Start Fiji (ImageJ) Service from the Tools menu");
 	  	String string2 = ("One of two dialog boxes will appear.");
 	  	String string3 = ("If a VCell plugin is not currently installed in Fiji choose install new plugin, then navigate to the FIJI installation folder and select the 'plugins' folder; the VCell plugin for FIJI will be automatically installed in the selected plugins folder.\n"
 	  			+ "If a plugin was previously installed choose either Continue to use the current plugin -or- Update plugin or Change path to reinstall/update the plugin.\n"
@@ -78,16 +78,16 @@ public class Help extends ContextCommand{
 	  	label1.setText("<html>"+ string1 +"</html>");
 	  	c.gridx = 0;
 	  	c.gridy = 0;
-	  	a.add(label1,c);
+	  	frame.add(label1,c);
 		c.gridx = 0;
 	  	c.gridy = 1;
 	  	Image imageRow;
 		try {
-
+			double scaleFactor = 1;
 		    URL url = new URL("https://i.imgur.com/QEUyTH3.png");
-		    imageRow = ImageIO.read(url);
+		    imageRow = (ImageIO.read(url)).getScaledInstance((int)((ImageIO.read(url).getWidth())*scaleFactor), (int)((ImageIO.read(url).getHeight())*scaleFactor), Image.SCALE_DEFAULT);
 		    JLabel picLabel = new JLabel(new ImageIcon(imageRow));
-		    a.add(picLabel,c);
+		    frame.add(picLabel,c);
 		} catch (Exception exp) {
 		    exp.printStackTrace();
 		} 
@@ -95,18 +95,18 @@ public class Help extends ContextCommand{
 	  	c.gridy = 2;
 	  	JLabel label2 = new JLabel();
 	  	label2.setText("<html>"+ string2 +"</html>");
-	  	a.add(label2,c);
+	  	frame.add(label2,c);
 		c.gridx = 0;
 	  	c.gridy = 3;
 	  	c.fill = GridBagConstraints.NONE;
 	  	Image image2;
 		try {
-
+			double scaleFactor = 1;
 		    URL url = new URL("https://i.imgur.com/G5bC542.png");
-		    image2 = ImageIO.read(url);
+		    image2 = (ImageIO.read(url)).getScaledInstance((int)((ImageIO.read(url).getWidth())*scaleFactor), (int)((ImageIO.read(url).getHeight())*scaleFactor), Image.SCALE_DEFAULT);
 		    JLabel picLabel = new JLabel(new ImageIcon(image2));
 		    picLabel.setMaximumSize(new Dimension(100,100));
-		    a.add(picLabel,c);
+		    frame.add(picLabel,c);
 		} catch (Exception exp) {
 		    exp.printStackTrace();
 		} 
@@ -115,9 +115,9 @@ public class Help extends ContextCommand{
 	  	c.gridy = 4;
 		JLabel label3 = new JLabel();
 	  	label3.setText("<html>"+ string3 +"</html>");
-		a.add(label3,c);
+		frame.add(label3,c);
 		//a.setPreferredSize(new Dimension(500,500));
-	  	a.setVisible(true);
+	  	frame.setVisible(true);
 		/*e.add(a);
 		a.setSize(new Dimension(500,500));
 		e.setVisible(true); */

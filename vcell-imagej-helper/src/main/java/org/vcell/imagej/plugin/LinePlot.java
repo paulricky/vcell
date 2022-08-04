@@ -2,6 +2,7 @@ package org.vcell.imagej.plugin;
 
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import org.jfree.chart.ChartFactory;
@@ -33,7 +34,7 @@ public class LinePlot extends ContextCommand{
   	@Parameter
 	private VCellHelper vcellHelper;
   	
-  	@Parameter (choices={"bm", "mm"}, style="listBox")
+  	@Parameter (choices={"BioModel", "MathModel"}, style="listBox")
   	private String modelType;
   	
 	@Parameter
@@ -65,6 +66,9 @@ public class LinePlot extends ContextCommand{
 	@Parameter
 	private String  imageName = "test";
 
+	//@Parameter
+	// JButton help = new JButton("?");
+
 	public static void main(String[] args) {
         // create the ImageJ application context with all available services
         final ImageJ ij = new ImageJ();
@@ -73,6 +77,10 @@ public class LinePlot extends ContextCommand{
 
 	@Override
 	public void run() {
+		
+	//	if (help.getModel().isPressed()) {
+	//		
+	//	}
 		
 		try {
 			//Find the port that a separately running VCell client is listening on
