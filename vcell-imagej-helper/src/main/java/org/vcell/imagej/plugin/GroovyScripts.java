@@ -343,7 +343,7 @@ public class GroovyScripts extends ContextCommand{
 		c.gridwidth = 1;
 		Image groovyLogo;
 		try {
-			double scaleFactor = 0.45;
+			double scaleFactor = 0.25;
 		    URL url = new URL("https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Groovy-logo.svg/1200px-Groovy-logo.svg.png");
 		    groovyLogo = (ImageIO.read(url)).getScaledInstance((int)((ImageIO.read(url).getWidth())*scaleFactor), (int)((ImageIO.read(url).getHeight())*scaleFactor), Image.SCALE_DEFAULT);
 		    JLabel picLabel = new JLabel(new ImageIcon(groovyLogo));
@@ -354,7 +354,7 @@ public class GroovyScripts extends ContextCommand{
 		c.gridx = 1;
 		Image vcellLogo;
 		try {
-			double scaleFactor = 3;
+			double scaleFactor = 2;
 		    URL url = new URL("https://i.imgur.com/mhxoPJD.png");
 		    vcellLogo = (ImageIO.read(url)).getScaledInstance((int)((ImageIO.read(url).getWidth())*scaleFactor), (int)((ImageIO.read(url).getHeight())*scaleFactor), Image.SCALE_DEFAULT);
 		    JLabel picLabel = new JLabel(new ImageIcon(vcellLogo));

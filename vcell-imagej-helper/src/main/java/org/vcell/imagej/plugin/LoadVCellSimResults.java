@@ -149,7 +149,7 @@ import javax.swing.JOptionPane;
  * changes show up in this project choose thisEclipse->Project->Clean...->clean.
  * </p>
  */
-@Plugin(type = ContextCommand.class, menuPath = "Plugins>VCell>Load VCell SimResults")
+@Plugin(type = ContextCommand.class, menuPath = "Plugins>VCell> Load VCell SimResults")
 public class LoadVCellSimResults extends ContextCommand {
 
 //	final UIService service = getContext().getService(UIService.class);
@@ -851,8 +851,7 @@ public class LoadVCellSimResults extends ContextCommand {
 									selectJPanel.add(maxTimeJLabel);
 									selectJPanel.add(maxTimeJSlider1);
 									// jp.setSize(325, 450);
-									int response = JOptionPane.showConfirmDialog(jp, selectJPanel,
-											"Select Vars and Times", JOptionPane.OK_CANCEL_OPTION);
+									int response = JOptionPane.showConfirmDialog(jp, selectJPanel,	"Select Vars and Times", JOptionPane.OK_CANCEL_OPTION);
 									if (response != JOptionPane.OK_OPTION) {
 										return;
 									}
