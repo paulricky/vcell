@@ -384,7 +384,7 @@ public class GroovyScripts extends ContextCommand{
 		    						e1.printStackTrace();
 		    					}
 							Desktop.getDesktop().browse(url);
-						} catch (IOException e1) {
+						  } catch (IOException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}

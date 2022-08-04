@@ -102,64 +102,63 @@ import net.imglib2.img.basictypeaccess.array.DoubleArray;
 import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.util.Pair;
 
-
 /**
- * This example illustrates how to create an ImageJ {@link ContextCommand} plugin that uses VCellHelper.
+ * This example illustrates how to create an ImageJ {@link ContextCommand}
+ * plugin that uses VCellHelper.
  * <p>
- * You should replace the parameter fields with your own inputs and outputs,
- * and replace the {@link run} method implementation with your own logic.
+ * You should replace the parameter fields with your own inputs and outputs, and
+ * replace the {@link run} method implementation with your own logic.
  * </p>
  * <p>
- * To add VCellHelper to this project,
- * rt-click on topmost tree element
- * "imagej-plugin2"->Properties->Libraries tab->Add External Jars...->
- * File Dialog->{EclipseVCellWorkspaceRootDir}/vcell/vcell-imagej-helper/target/vcell-imagej-helper-0.0.1-SNAPSHOT.jar.
+ * To add VCellHelper to this project, rt-click on topmost tree element
+ * "imagej-plugin2"->Properties->Libraries tab->Add External Jars...-> File
+ * Dialog->{EclipseVCellWorkspaceRootDir}/vcell/vcell-imagej-helper/target/vcell-imagej-helper-0.0.1-SNAPSHOT.jar.
  * </p>
  * <p>
- * Once vcell-imagej-helper-0.0.1-SNAPSHOT.jar has been added to the Libraries tab open
- * the small arrow to the left and select "Source Attachment"->Add/Edit->External Location->
- * External File Dialog->{EclipseVCellWorkspaceRootDir}/vcell/vcell-imagej-helper/target/vcell-imagej-helper-0.0.1-SNAPSHOT-sources.jar.
+ * Once vcell-imagej-helper-0.0.1-SNAPSHOT.jar has been added to the Libraries
+ * tab open the small arrow to the left and select "Source
+ * Attachment"->Add/Edit->External Location-> External File
+ * Dialog->{EclipseVCellWorkspaceRootDir}/vcell/vcell-imagej-helper/target/vcell-imagej-helper-0.0.1-SNAPSHOT-sources.jar.
  * </p>
  * <p>
- * When editing the original VCellHelper in another running Eclipse,
- * to make the changes show up in this project choose thisEclipse->Project->Clean...->clean.
+ * When editing the original VCellHelper in another running Eclipse, to make the
+ * changes show up in this project choose thisEclipse->Project->Clean...->clean.
  * </p>
-  */
+ */
 @Plugin(type = ContextCommand.class)
 public class VCellPlugin_Minimal extends ContextCommand {
-	
+
 //	final UIService service = getContext().getService(UIService.class);
 //	System.out.println(service.getDefaultUI().getApplicationFrame().getClass().getName()+" "+(service.getDefaultUI().getApplicationFrame() instanceof Frame));
 
-		private static Frame mainApplicationFrame;
-	
+	private static Frame mainApplicationFrame;
+
 	public static class StyledComboBoxUI extends BasicComboBoxUI {
-		  protected ComboPopup createPopup() {
-		    @SuppressWarnings("serial")
+		protected ComboPopup createPopup() {
+			@SuppressWarnings("serial")
 			BasicComboPopup popup = new BasicComboPopup(comboBox) {
-		      @Override
-		      protected Rectangle computePopupBounds(int px,int py,int pw,int ph) {
-		        return super.computePopupBounds(
-		            px,py,Math.max(comboBox.getPreferredSize().width,pw),ph
-		        );
-		      }
-		    };
-		    popup.getAccessibleContext().setAccessibleParent(comboBox);
-		    return popup;
-		  }
+				@Override
+				protected Rectangle computePopupBounds(int px, int py, int pw, int ph) {
+					return super.computePopupBounds(px, py, Math.max(comboBox.getPreferredSize().width, pw), ph);
+				}
+			};
+			popup.getAccessibleContext().setAccessibleParent(comboBox);
+			return popup;
 		}
+	}
 
 	@SuppressWarnings("serial")
 	public static class StyledComboBox<E> extends JComboBox<String> {
-		  public StyledComboBox() {
-		    setUI(new StyledComboBoxUI());
-		  }
-		  public StyledComboBox(String[] items) {
-			  setUI(new StyledComboBoxUI());
-			  setModel(new DefaultComboBoxModel<String>(items));
-		  }
+		public StyledComboBox() {
+			setUI(new StyledComboBoxUI());
 		}
-	
+
+		public StyledComboBox(String[] items) {
+			setUI(new StyledComboBoxUI());
+			setModel(new DefaultComboBoxModel<String>(items));
+		}
+	}
+
 	public static class VCellSelection {
 		public String theCacheKey;
 		public VCellHelper.ModelType modelType;
@@ -170,27 +169,28 @@ public class VCellPlugin_Minimal extends ContextCommand {
 		public String[] varName;
 		public int[] timePointIndexes;
 		public Exception exception;
-		public VCellSelection(String theCacheKey, VCellHelper.ModelType modelType,String userid,String modelName, String appName, String simname,String[] varName,int[] timePointIndexes) {
+
+		public VCellSelection(String theCacheKey, VCellHelper.ModelType modelType, String userid, String modelName,
+				String appName, String simname, String[] varName, int[] timePointIndexes) {
 			super();
 			this.theCacheKey = theCacheKey;
 			this.modelType = modelType;
-			this.userid=userid;
+			this.userid = userid;
 			this.modelName = modelName;
 			this.appName = appName;
 			this.simname = simname;
 			this.varName = varName;
 			this.timePointIndexes = timePointIndexes;
 		}
+
 		public VCellSelection(Exception exception) {
 			this.exception = exception;
 		}
 	}
-	
 
-	
 	@Plugin(type = PreprocessorPlugin.class)
 	public static class MyPreProcessor extends AbstractPreprocessorPlugin {
-		
+
 		public static final String CANCELLED = "cancelled";
 
 		@Parameter
@@ -199,13 +199,13 @@ public class VCellPlugin_Minimal extends ContextCommand {
 		@Parameter(required = true)
 		private VCellHelper vcellHelper;
 
-		private JComboBox<String> jcbModelType = new StyledComboBox<String>(new String[] {ModelType.bm.name(),ModelType.mm.name(),ModelType.quick.name()});
+		private JComboBox<String> jcbModelType = new StyledComboBox<String>(
+				new String[] { ModelType.bm.name(), ModelType.mm.name(), ModelType.quick.name() });
 		private JComboBox<String> jcbUserid = new StyledComboBox<String>();
 		private JComboBox<String> jcbModelNames = new StyledComboBox<String>();
 		private JComboBox<String> jcbAppNames = new StyledComboBox<String>();
 		private JComboBox<String> jcbSimNames = new StyledComboBox<String>();
 
-		
 		private Comparator<String> comp = new Comparator<String>() {
 			@Override
 			public int compare(String o1, String o2) {
@@ -213,13 +213,11 @@ public class VCellPlugin_Minimal extends ContextCommand {
 			}
 		};
 		private TreeSet<String> useridSet = new TreeSet<String>(comp);
-		private Hashtable<String,TreeSet<String>> mapUseridToModelNameTime  = new Hashtable<String, TreeSet<String>>();
-		private Hashtable<String,String> mapModelNameTimeToActualModelname  = new Hashtable<String, String>();
-		private Hashtable<String,TreeSet<String>> mapModelToApps = new Hashtable<String, TreeSet<String>>();
-		private Hashtable<String,TreeSet<String>> mapAppsToSims = new Hashtable<String, TreeSet<String>>();
+		private Hashtable<String, TreeSet<String>> mapUseridToModelNameTime = new Hashtable<String, TreeSet<String>>();
+		private Hashtable<String, String> mapModelNameTimeToActualModelname = new Hashtable<String, String>();
+		private Hashtable<String, TreeSet<String>> mapModelToApps = new Hashtable<String, TreeSet<String>>();
+		private Hashtable<String, TreeSet<String>> mapAppsToSims = new Hashtable<String, TreeSet<String>>();
 
-	
-		
 		public MyPreProcessor() {
 //			jcbModelType.addActionListener(new ActionListener() {
 //			@Override
@@ -234,57 +232,64 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //			jcbModelType.setSelectedIndex(0);
 
 		}
-		
-		private String createMapAppToSimsKeyName(String modelName,String appName) {
-			//return jcbModelNames.getSelectedItem()+" "+jcbAppNames.getSelectedItem();
-			return modelName+" "+(appName==null?modelName:appName);
+
+		private String createMapAppToSimsKeyName(String modelName, String appName) {
+			// return jcbModelNames.getSelectedItem()+" "+jcbAppNames.getSelectedItem();
+			return modelName + " " + (appName == null ? modelName : appName);
 		}
-		private void searchVCell() throws Exception{
+
+		private void searchVCell() throws Exception {
 			final UIService service = getContext().getService(UIService.class);
 			Object obj = service.getDefaultUI().getApplicationFrame();
-			if(obj instanceof UIComponent && ((UIComponent)obj).getComponent() instanceof Frame) {
-				mainApplicationFrame = (Frame)((UIComponent)obj).getComponent();
-			}else if(obj instanceof Frame) {
-				mainApplicationFrame = (Frame)obj;
+			if (obj instanceof UIComponent && ((UIComponent) obj).getComponent() instanceof Frame) {
+				mainApplicationFrame = (Frame) ((UIComponent) obj).getComponent();
+			} else if (obj instanceof Frame) {
+				mainApplicationFrame = (Frame) obj;
 			}
-			//System.out.println(service.getDefaultUI().getApplicationFrame().getClass().getName()+" "+(service.getDefaultUI().getApplicationFrame() instanceof Frame));
+			// System.out.println(service.getDefaultUI().getApplicationFrame().getClass().getName()+"
+			// "+(service.getDefaultUI().getApplicationFrame() instanceof Frame));
 
-			displayProgressBar(true, "Searching Database...", "VCell Model Loader", 25,uiService);
-			VCellHelper.VCellModelSearch vcms = new VCellHelper.VCellModelSearch(ModelType.valueOf(jcbModelType.getSelectedItem().toString()),null,null,null,null,null,null);
-			displayProgressBar(true, "Creating GUI...", "VCell Model Loader", 100,uiService);
+			displayProgressBar(true, "Searching Database...", "VCell Model Loader", 25, uiService);
+			VCellHelper.VCellModelSearch vcms = new VCellHelper.VCellModelSearch(
+					ModelType.valueOf(jcbModelType.getSelectedItem().toString()), null, null, null, null, null, null);
+			displayProgressBar(true, "Creating GUI...", "VCell Model Loader", 100, uiService);
 			try {
 				final DateFormat dateTimeInstance = DateFormat.getDateTimeInstance();
-				ArrayList<VCellModelSearchResults> vcmsr = vcellHelper.getSearchedModelSimCacheKey(false,vcms,null);
+				ArrayList<VCellModelSearchResults> vcmsr = vcellHelper.getSearchedModelSimCacheKey(false, vcms, null);
 				useridSet = new TreeSet<String>(comp);
-				mapUseridToModelNameTime  = new Hashtable<String, TreeSet<String>>();
-				mapModelNameTimeToActualModelname  = new Hashtable<String, String>();
+				mapUseridToModelNameTime = new Hashtable<String, TreeSet<String>>();
+				mapModelNameTimeToActualModelname = new Hashtable<String, String>();
 				mapModelToApps = new Hashtable<String, TreeSet<String>>();
 				mapAppsToSims = new Hashtable<String, TreeSet<String>>();
 
 				final Iterator<VCellModelSearchResults> iterator = vcmsr.iterator();
-				while(iterator.hasNext()) {
+				while (iterator.hasNext()) {
 					final VCellModelSearchResults next = iterator.next();
 					String userid = next.getUserId();
 					useridSet.add(userid);
 					final String modelName = next.getModelName();
-					final String modelNameTime = modelName+" ("+next.getModelType().name()+")"+" - "+(next.getDate()==null?"unsaved":dateTimeInstance.format(new Date(next.getDate())));
+					final String modelNameTime = modelName + " (" + next.getModelType().name() + ")" + " - "
+							+ (next.getDate() == null ? "unsaved" : dateTimeInstance.format(new Date(next.getDate())));
 					TreeSet<String> modelsForUserid = mapUseridToModelNameTime.get(userid);
-					if(modelsForUserid == null) {
+					if (modelsForUserid == null) {
 						modelsForUserid = new TreeSet<String>();
 						mapUseridToModelNameTime.put(userid, modelsForUserid);
 					}
 					modelsForUserid.add(modelNameTime);
 					mapModelNameTimeToActualModelname.put(modelNameTime, modelName);
-					//System.out.println(modelName+" "+next.getApplicationName()+" "+next.getSimulationName());
+					// System.out.println(modelName+" "+next.getApplicationName()+"
+					// "+next.getSimulationName());
 					TreeSet<String> appsForModel = mapModelToApps.get(modelNameTime);
-					if(appsForModel == null) {
+					if (appsForModel == null) {
 						appsForModel = new TreeSet<String>();
 						mapModelToApps.put(modelNameTime, appsForModel);
 					}
-					appsForModel.add((next.getModelType()==ModelType.mm?modelNameTime:next.getApplicationName()));
-					String modelNameTimeApp = createMapAppToSimsKeyName(modelNameTime,(next.getModelType()==ModelType.mm?null:next.getApplicationName()));//modelNameTime+(next.getModelType()==ModelType.mm?"":" "+next.getApplicationName());
+					appsForModel.add((next.getModelType() == ModelType.mm ? modelNameTime : next.getApplicationName()));
+					String modelNameTimeApp = createMapAppToSimsKeyName(modelNameTime,
+							(next.getModelType() == ModelType.mm ? null : next.getApplicationName()));// modelNameTime+(next.getModelType()==ModelType.mm?"":"
+																										// "+next.getApplicationName());
 					TreeSet<String> simsForApp = mapAppsToSims.get(modelNameTimeApp);
-					if(simsForApp == null) {
+					if (simsForApp == null) {
 						simsForApp = new TreeSet<String>();
 						mapAppsToSims.put(modelNameTimeApp, simsForApp);
 					}
@@ -299,11 +304,12 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //				vcellModelsInput.setValue(module, new VCellSelection(e));//return empty VCellSelection
 //				module.resolveInput(vcellModelsInput.getName());
 //				return;
-			}finally {
-				displayProgressBar(false, "Creating GUI...", "VCell Model Loader", 100,uiService);
+			} finally {
+				displayProgressBar(false, "Creating GUI...", "VCell Model Loader", 100, uiService);
 			}
 
 		}
+
 		@Override
 		public void process(Module module) {
 			final ModuleItem<VCellSelection> vcellModelsInput = getvcellModelsInput(module);
@@ -317,7 +323,7 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //				module.resolveInput(vcellModelsInput.getName());
 //				return;
 //			}
-			
+
 //			displayProgressBar(true, "Searching Database...", "VCell Model Loader", 25,uiService);
 //			VCellHelper.VCellModelSearch vcms = new VCellHelper.VCellModelSearch(ModelType.valueOf(jcbModelType.getSelectedItem().toString()),null,null,null,null,null,null);
 //			displayProgressBar(true, "Creating GUI...", "VCell Model Loader", 100,uiService);
@@ -362,9 +368,10 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //			}finally {
 //				displayProgressBar(false, "Creating GUI...", "VCell Model Loader", 100,uiService);
 //			}
-			
-			//ApplicationFrame applicationFrame = uiService.getDefaultUI().getApplicationFrame();
-			final Dimension dim = new Dimension(300,120);
+
+			// ApplicationFrame applicationFrame =
+			// uiService.getDefaultUI().getApplicationFrame();
+			final Dimension dim = new Dimension(300, 120);
 			@SuppressWarnings("serial")
 			final JPanel jp = new JPanel() {
 				@Override
@@ -372,32 +379,31 @@ public class VCellPlugin_Minimal extends ContextCommand {
 					return dim;
 				}
 			};
-			jp.setLayout(new GridLayout(8,2));
-			
-	        JButton site = new JButton("VCell Website");
-	        site.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent e) {
-	               
-	                try {
-	                   
-	                    String myurl = "https://vcell.org/";
-	                   
-	                    java.awt.Desktop.getDesktop().browse(java.net.URI.create(myurl));
-	                   
-	                } catch (Exception e2) {
-	                    // TODO: handle exception
-	                    e2.printStackTrace();
-	                }
-	            }
-	        });
-			
-			final boolean[] bUseVCellSelectionHolder = new boolean[] {false};
+			jp.setLayout(new GridLayout(8, 2));
 
-			//jcbModelType
+			JButton site = new JButton("VCell Website");
+			site.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+
+					try {
+
+						String myurl = "https://vcell.org/";
+
+						java.awt.Desktop.getDesktop().browse(java.net.URI.create(myurl));
+
+					} catch (Exception e2) {
+						// TODO: handle exception
+						e2.printStackTrace();
+					}
+				}
+			});
+
+			final boolean[] bUseVCellSelectionHolder = new boolean[] { false };
+
+			// jcbModelType
 			jp.add(new JLabel("Model Type"));
 			jp.add(jcbModelType);
-			
-			
+
 			jp.add(new JLabel("VCell Userid"));
 			JComboBox<String> jcbUserid = new StyledComboBox<String>(useridSet.toArray(new String[0]));
 			jcbModelType.addActionListener(new ActionListener() {
@@ -409,7 +415,8 @@ public class VCellPlugin_Minimal extends ContextCommand {
 							try {
 								searchVCell();
 							} catch (Exception e1) {
-								uiService.showDialog("Error in searchVCell()\n"+e1.getClass().getName()+"\n"+e1.getMessage());
+								uiService.showDialog(
+										"Error in searchVCell()\n" + e1.getClass().getName() + "\n" + e1.getMessage());
 								JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(jp);
 								topFrame.dispose();
 								return;
@@ -417,63 +424,78 @@ public class VCellPlugin_Minimal extends ContextCommand {
 							SwingUtilities.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									if(vcellModelsInput.getDefaultValue() != null && vcellModelsInput.getDefaultValue().modelType.name().equals(jcbModelType.getSelectedItem().toString())) {
+									if (vcellModelsInput.getDefaultValue() != null
+											&& vcellModelsInput.getDefaultValue().modelType.name()
+													.equals(jcbModelType.getSelectedItem().toString())) {
 										bUseVCellSelectionHolder[0] = true;
 									}
 									jcbUserid.removeAllItems();
-									jcbUserid.setModel(new DefaultComboBoxModel<String>(useridSet.toArray(new String[0])));
-									if(jcbUserid.getItemCount()==0) {
+									jcbUserid.setModel(
+											new DefaultComboBoxModel<String>(useridSet.toArray(new String[0])));
+									if (jcbUserid.getItemCount() == 0) {
 										jcbUserid.addItem("Nothing Found");
-									}else if(bUseVCellSelectionHolder[0]) {
+									} else if (bUseVCellSelectionHolder[0]) {
 										jcbUserid.setSelectedItem(vcellModelsInput.getDefaultValue().userid);
-									}else {
+									} else {
 										jcbUserid.setSelectedIndex(0);
 									}
 									bUseVCellSelectionHolder[0] = false;
-								}});
-						}}).start();
-				}});
+								}
+							});
+						}
+					}).start();
+				}
+			});
 			jp.add(jcbUserid);
 
 			jp.add(new JLabel("Model Name"));
-			JComboBox<String> jcbModelNames = new StyledComboBox<String>(mapUseridToModelNameTime.get(jcbUserid.getSelectedItem()).toArray(new String[0]));
+			JComboBox<String> jcbModelNames = new StyledComboBox<String>(
+					mapUseridToModelNameTime.get(jcbUserid.getSelectedItem()).toArray(new String[0]));
 			jcbUserid.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					jcbModelNames.removeAllItems();
-					if(jcbUserid.getSelectedItem() != null && mapUseridToModelNameTime.get(jcbUserid.getSelectedItem()) != null) {
-						jcbModelNames.setModel(new DefaultComboBoxModel<String>(mapUseridToModelNameTime.get(jcbUserid.getSelectedItem()).toArray(new String[0])));
-						if(bUseVCellSelectionHolder[0]) {
-							for(int i=0;i<jcbModelNames.getModel().getSize();i++) {
-								//Do this because the model names are annotated with their date in this combobox
-								if(jcbModelNames.getModel().getElementAt(i).toString().startsWith(vcellModelsInput.getDefaultValue().modelName)) {
+					if (jcbUserid.getSelectedItem() != null
+							&& mapUseridToModelNameTime.get(jcbUserid.getSelectedItem()) != null) {
+						jcbModelNames.setModel(new DefaultComboBoxModel<String>(
+								mapUseridToModelNameTime.get(jcbUserid.getSelectedItem()).toArray(new String[0])));
+						if (bUseVCellSelectionHolder[0]) {
+							for (int i = 0; i < jcbModelNames.getModel().getSize(); i++) {
+								// Do this because the model names are annotated with their date in this
+								// combobox
+								if (jcbModelNames.getModel().getElementAt(i).toString()
+										.startsWith(vcellModelsInput.getDefaultValue().modelName)) {
 									jcbModelNames.setSelectedIndex(i);
 									break;
 								}
 							}
-						}else {
+						} else {
 							jcbModelNames.setSelectedIndex(0);
 						}
 					}
-				}});
+				}
+			});
 			jp.add(jcbModelNames);
 
-			
 			jp.add(new JLabel("App Name"));
-			JComboBox<String> jcbAppNames = new StyledComboBox<String>(mapModelToApps.get(jcbModelNames.getSelectedItem()).toArray(new String[0]));
+			JComboBox<String> jcbAppNames = new StyledComboBox<String>(
+					mapModelToApps.get(jcbModelNames.getSelectedItem()).toArray(new String[0]));
 			jcbModelNames.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					jcbAppNames.removeAllItems();
-					if(jcbModelNames.getSelectedItem() != null && mapModelToApps.get(jcbModelNames.getSelectedItem()) != null) {
-						jcbAppNames.setModel(new DefaultComboBoxModel<String>(mapModelToApps.get(jcbModelNames.getSelectedItem()).toArray(new String[0])));
-						if(bUseVCellSelectionHolder[0]) {
+					if (jcbModelNames.getSelectedItem() != null
+							&& mapModelToApps.get(jcbModelNames.getSelectedItem()) != null) {
+						jcbAppNames.setModel(new DefaultComboBoxModel<String>(
+								mapModelToApps.get(jcbModelNames.getSelectedItem()).toArray(new String[0])));
+						if (bUseVCellSelectionHolder[0]) {
 							jcbAppNames.setSelectedItem(vcellModelsInput.getDefaultValue().appName);
-						}else {
+						} else {
 							jcbAppNames.setSelectedIndex(0);
 						}
 					}
-				}});
+				}
+			});
 			jp.add(jcbAppNames);
 
 			final JComboBox<String> jcbVars = new StyledComboBox<String>();
@@ -489,17 +511,21 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //					jcbVars.removeAllItems();
 //					jcbTimes.removeAllItems();
 					jcbSimNames.removeAllItems();
-					if(jcbAppNames.getSelectedItem() != null && mapAppsToSims.get(jcbModelNames.getSelectedItem()+" "+jcbAppNames.getSelectedItem()) != null) {
-						jcbSimNames.setModel(new DefaultComboBoxModel<String>(mapAppsToSims.get(jcbModelNames.getSelectedItem()+" "+jcbAppNames.getSelectedItem()).toArray(new String[0])));
-						if(bUseVCellSelectionHolder[0]) {
+					if (jcbAppNames.getSelectedItem() != null && mapAppsToSims
+							.get(jcbModelNames.getSelectedItem() + " " + jcbAppNames.getSelectedItem()) != null) {
+						jcbSimNames.setModel(new DefaultComboBoxModel<String>(
+								mapAppsToSims.get(jcbModelNames.getSelectedItem() + " " + jcbAppNames.getSelectedItem())
+										.toArray(new String[0])));
+						if (bUseVCellSelectionHolder[0]) {
 							jcbSimNames.setSelectedItem(vcellModelsInput.getDefaultValue().simname);
-						}else {
+						} else {
 							jcbSimNames.setSelectedIndex(0);
 						}
 					}
-				}});
+				}
+			});
 			jp.add(jcbSimNames);
-			
+
 //			if(vcellModelsInput.getDefaultValue() != null) {//If user provided an inital value for VCellSelection var in VCellPlugin
 //				final VCellSelection defaultValue = vcellModelsInput.getDefaultValue();
 //				jcbUserid.setSelectedItem(defaultValue.userid);
@@ -528,7 +554,6 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //			final int[] ijVarInfoSelectionIndexesVars;
 //			final int[] ijVarInfoSelectionIndexesTimes;
 
-			
 //			jp.add(new JLabel("Show Vars and Times"));
 //			final JButton loadVarsAndTimesBtn = new JButton("Show...");
 //			loadVarsAndTimesBtn.addActionListener(new ActionListener() {
@@ -543,11 +568,11 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //				}
 //				});
 //			jp.add(loadVarsAndTimesBtn);
-			
+
 			JTable jtVars = new JTable();
 			JSlider minTimeJSlider1 = new javax.swing.JSlider();
 			JSlider maxTimeJSlider1 = new javax.swing.JSlider();
-			
+
 			jp.add(new JLabel("Vars and Times"));
 			JButton selectMultipleVarsAndTimesBtn = new JButton("Select...");
 			selectMultipleVarsAndTimesBtn.addActionListener(new ActionListener() {
@@ -557,11 +582,12 @@ public class VCellPlugin_Minimal extends ContextCommand {
 						@Override
 						public void run() {
 							ijVarInfosHolder[0] = null;
-							populateVarAndTimes(cacheKeyHolder, ijVarInfosHolder/*
-												 * vcellModelsInput.getDefaultValue(), jcbVars, jcbTimes,
-												 * cacheKeyHolder, ijVarInfosHolder
-												 */);
-							while(ijVarInfosHolder[0] == null) {
+							populateVarAndTimes(cacheKeyHolder,
+									ijVarInfosHolder/*
+													 * vcellModelsInput.getDefaultValue(), jcbVars, jcbTimes,
+													 * cacheKeyHolder, ijVarInfosHolder
+													 */);
+							while (ijVarInfosHolder[0] == null) {
 								try {
 									Thread.sleep(100);
 								} catch (InterruptedException e) {
@@ -569,59 +595,67 @@ public class VCellPlugin_Minimal extends ContextCommand {
 									e.printStackTrace();
 								}
 							}
-							if(ijVarInfosHolder[0].getSimname() == null) {//nothing found or error
+							if (ijVarInfosHolder[0].getSimname() == null) {// nothing found or error
 								return;
 							}
 							SwingUtilities.invokeLater(new Runnable() {
 								@Override
 								public void run() {
 									JPanel selectJPanel = new JPanel();
-									//GridLayout selectGridLayout = new GridLayout(5,1);
-									BoxLayout boxLayout = new BoxLayout(selectJPanel,BoxLayout.Y_AXIS);
+									// GridLayout selectGridLayout = new GridLayout(5,1);
+									BoxLayout boxLayout = new BoxLayout(selectJPanel, BoxLayout.Y_AXIS);
 									selectJPanel.setLayout(boxLayout);
-									//Variables
+									// Variables
 //									for(int i=0;i<ijVarInfosHolder[0].getIjVarInfo().size();i++) {
 //									jcbVars.insertItemAt(""+ijVarInfosHolder[0].getIjVarInfo().get(i).getName()+":"+ijVarInfosHolder[0].getIjVarInfo().get(i).getDomain()+" ("+ijVarInfosHolder[0].getIjVarInfo().get(i).getVariableType()+")", i);
 //								}
 
 									Object[][] dataVars = new Object[ijVarInfosHolder[0].getIjVarInfo().size()][3];
-									for(int i=0;i<ijVarInfosHolder[0].getIjVarInfo().size();i++) {
+									for (int i = 0; i < ijVarInfosHolder[0].getIjVarInfo().size(); i++) {
 										dataVars[i][0] = ijVarInfosHolder[0].getIjVarInfo().get(i).getName();
 										dataVars[i][1] = ijVarInfosHolder[0].getIjVarInfo().get(i).getDomain();
 										dataVars[i][2] = ijVarInfosHolder[0].getIjVarInfo().get(i).getVariableType();
 									}
 //									JTable jtVars = new JTable(dataVars,new String[] {"Variables"});
-									jtVars.setModel(new DefaultTableModel(dataVars,new String[] {"Variable","Domain","Type"}));
-									//jtVars.setBounds(0, 0, 300,300);
-									//jtVars.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-									//jtVars.setPreferredSize(new Dimension(200,200));
+									jtVars.setModel(new DefaultTableModel(dataVars,
+											new String[] { "Variable", "Domain", "Type" }));
+									// jtVars.setBounds(0, 0, 300,300);
+									// jtVars.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+									// jtVars.setPreferredSize(new Dimension(200,200));
 									JScrollPane jspVars = new JScrollPane(jtVars);
-									
-									//Times
+
+									// Times
 //									for(int i=0;i<ijVarInfosHolder[0].getTimes().length;i++) {
 //									jcbTimes.insertItemAt(""+ijVarInfosHolder[0].getTimes()[i], i);
 //								}
 
 									final String MINTIMESTR = "Min Time ";
 									final String MAXTIMESTR = "Max Time ";
-									final JLabel minTimeJLabel = new JLabel(MINTIMESTR+ijVarInfosHolder[0].getTimes()[0]);
-									final JLabel maxTimeJLabel = new JLabel(MAXTIMESTR+ijVarInfosHolder[0].getTimes()[ijVarInfosHolder[0].getTimes().length-1]);
+									final JLabel minTimeJLabel = new JLabel(
+											MINTIMESTR + ijVarInfosHolder[0].getTimes()[0]);
+									final JLabel maxTimeJLabel = new JLabel(MAXTIMESTR + ijVarInfosHolder[0]
+											.getTimes()[ijVarInfosHolder[0].getTimes().length - 1]);
 //									JSlider minTimeJSlider1 = new javax.swing.JSlider();
 //									JSlider maxTimeJSlider1 = new javax.swing.JSlider();
 									ChangeListener changeListener = new ChangeListener() {
 										@Override
 										public void stateChanged(ChangeEvent ce) {
-											if(ce.getSource()==minTimeJSlider1 && minTimeJSlider1.getValue() > maxTimeJSlider1.getValue()){
+											if (ce.getSource() == minTimeJSlider1
+													&& minTimeJSlider1.getValue() > maxTimeJSlider1.getValue()) {
 												maxTimeJSlider1.setValue(minTimeJSlider1.getValue());
 												return;
-											}else if(ce.getSource()==maxTimeJSlider1 && maxTimeJSlider1.getValue() < minTimeJSlider1.getValue()){
+											} else if (ce.getSource() == maxTimeJSlider1
+													&& maxTimeJSlider1.getValue() < minTimeJSlider1.getValue()) {
 												minTimeJSlider1.setValue(maxTimeJSlider1.getValue());
 												return;
 											}
-											minTimeJLabel.setText(MINTIMESTR+ijVarInfosHolder[0].getTimes()[minTimeJSlider1.getValue()]);
-											maxTimeJLabel.setText(MAXTIMESTR+ijVarInfosHolder[0].getTimes()[maxTimeJSlider1.getValue()]);
-										}};
-									
+											minTimeJLabel.setText(MINTIMESTR
+													+ ijVarInfosHolder[0].getTimes()[minTimeJSlider1.getValue()]);
+											maxTimeJLabel.setText(MAXTIMESTR
+													+ ijVarInfosHolder[0].getTimes()[maxTimeJSlider1.getValue()]);
+										}
+									};
+
 									minTimeJSlider1.setName("minTime");
 									minTimeJSlider1.setPaintTicks(true);
 									minTimeJSlider1.setMajorTickSpacing(10);
@@ -630,7 +664,7 @@ public class VCellPlugin_Minimal extends ContextCommand {
 									minTimeJSlider1.setMaximum(ijVarInfosHolder[0].getTimes().length - 1);
 									minTimeJSlider1.setValue(0);
 									minTimeJSlider1.addChangeListener(changeListener);
-									
+
 									maxTimeJSlider1.setName("maxTime");
 									maxTimeJSlider1.setPaintTicks(true);
 									maxTimeJSlider1.setMajorTickSpacing(10);
@@ -647,40 +681,43 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //									JTable jtVars = new JTable(dataVars,new String[] {"Variables"});
 //									jtVars.setBounds(0, 0, 300,300);
 //									JScrollPane jspVars = new JScrollPane(jtVars);
-									
-									//jtVars.setPreferredScrollableViewportSize(jtVars.getPreferredSize());
+
+									// jtVars.setPreferredScrollableViewportSize(jtVars.getPreferredSize());
 									selectJPanel.add(jspVars);
 									selectJPanel.add(minTimeJLabel);
 									selectJPanel.add(minTimeJSlider1);
 									selectJPanel.add(maxTimeJLabel);
 									selectJPanel.add(maxTimeJSlider1);
-									//jp.setSize(325, 450);
-									int response = JOptionPane.showConfirmDialog(jp, selectJPanel,"Select Vars and Times",JOptionPane.OK_CANCEL_OPTION);
-									if(response != JOptionPane.OK_OPTION) {
+									// jp.setSize(325, 450);
+									int response = JOptionPane.showConfirmDialog(jp, selectJPanel,
+											"Select Vars and Times", JOptionPane.OK_CANCEL_OPTION);
+									if (response != JOptionPane.OK_OPTION) {
 										return;
 									}
 									ArrayList<Container> compList = new ArrayList<Container>();
-									compList.add(SwingUtilities.getAncestorOfClass(Window.class, selectMultipleVarsAndTimesBtn));
-									while(compList.size() > 0) {
+									compList.add(SwingUtilities.getAncestorOfClass(Window.class,
+											selectMultipleVarsAndTimesBtn));
+									while (compList.size() > 0) {
 										Container container = compList.remove(0);
-										for(int i=0;i<container.getComponentCount();i++) {
+										for (int i = 0; i < container.getComponentCount(); i++) {
 											Component comp = container.getComponent(i);
-											if(comp instanceof JButton && ((JButton)comp).getText().equals("OK")) {
-												((JButton)comp).doClick();
+											if (comp instanceof JButton && ((JButton) comp).getText().equals("OK")) {
+												((JButton) comp).doClick();
 												return;
-											}else if(comp instanceof Container) {
-												compList.add((Container)comp);
+											} else if (comp instanceof Container) {
+												compList.add((Container) comp);
 											}
 										}
 									}
 								}
 							});
 
-						}}).start();
-				
-				}});
+						}
+					}).start();
+
+				}
+			});
 			jp.add(selectMultipleVarsAndTimesBtn);
-			
 
 			jcbModelType.setSelectedIndex(0);
 
@@ -702,33 +739,38 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //				System.out.println(jcbSimNames.getSelectedItem());
 //			}
 
-			
-			displayProgressBar(false, "Creating GUI...", "VCell Model Loader", 100,uiService);
+			displayProgressBar(false, "Creating GUI...", "VCell Model Loader", 100, uiService);
 			int response = JOptionPane.showConfirmDialog(VCellPlugin_Minimal.mainApplicationFrame
-			/* (Component)IJ.getInstance() *//* uiService.getDefaultUI().getApplicationFrame() */, jp,"Select User Model App Sim",JOptionPane.OK_CANCEL_OPTION);
-			if(response != JOptionPane.OK_OPTION) {
-				vcellModelsInput.setValue(module, new VCellSelection(new Exception(CANCELLED)));//return VCellSelection with 'cancel' exception
+			/* (Component)IJ.getInstance() *//* uiService.getDefaultUI().getApplicationFrame() */, jp,
+					"Select User Model App Sim", JOptionPane.OK_CANCEL_OPTION);
+			if (response != JOptionPane.OK_OPTION) {
+				vcellModelsInput.setValue(module, new VCellSelection(new Exception(CANCELLED)));// return VCellSelection
+																								// with 'cancel'
+																								// exception
 				module.resolveInput(vcellModelsInput.getName());
 				return;
 			}
-			
-			ModelType modelType = ModelType.valueOf((String)jcbModelType.getSelectedItem());
-			String userid = jcbUserid.getSelectedItem().toString();
-			String modelName = (jcbModelNames.getSelectedItem()==null?null:mapModelNameTimeToActualModelname.get(jcbModelNames.getSelectedItem()).toString());
-			String appName = (jcbModelNames.getSelectedItem()==null?null:jcbAppNames.getSelectedItem().toString());
-			String simName = (jcbModelNames.getSelectedItem()==null?null:jcbSimNames.getSelectedItem().toString());
 
-			
+			ModelType modelType = ModelType.valueOf((String) jcbModelType.getSelectedItem());
+			String userid = jcbUserid.getSelectedItem().toString();
+			String modelName = (jcbModelNames.getSelectedItem() == null ? null
+					: mapModelNameTimeToActualModelname.get(jcbModelNames.getSelectedItem()).toString());
+			String appName = (jcbModelNames.getSelectedItem() == null ? null
+					: jcbAppNames.getSelectedItem().toString());
+			String simName = (jcbModelNames.getSelectedItem() == null ? null
+					: jcbSimNames.getSelectedItem().toString());
+
 			String[] selectedVarNames = new String[jtVars.getSelectedRows().length];
-			for(int i=0;i<jtVars.getSelectedRows().length;i++) {
+			for (int i = 0; i < jtVars.getSelectedRows().length; i++) {
 				selectedVarNames[i] = ijVarInfosHolder[0].getIjVarInfo().get(jtVars.getSelectedRows()[i]).getName();
 			}
-			int[] selectedTimeIndexes = new int[maxTimeJSlider1.getValue()-minTimeJSlider1.getValue()+1];
-			for(int i=minTimeJSlider1.getValue();i<=maxTimeJSlider1.getValue();i++) {
-				selectedTimeIndexes[i-minTimeJSlider1.getValue()] = i;
+			int[] selectedTimeIndexes = new int[maxTimeJSlider1.getValue() - minTimeJSlider1.getValue() + 1];
+			for (int i = minTimeJSlider1.getValue(); i <= maxTimeJSlider1.getValue(); i++) {
+				selectedTimeIndexes[i - minTimeJSlider1.getValue()] = i;
 			}
-			
-		    VCellSelection result = new VCellSelection(cacheKeyHolder[0], modelType, userid,modelName, appName, simName,selectedVarNames,selectedTimeIndexes);
+
+			VCellSelection result = new VCellSelection(cacheKeyHolder[0], modelType, userid, modelName, appName,
+					simName, selectedVarNames, selectedTimeIndexes);
 			vcellModelsInput.setValue(module, result);
 			module.resolveInput(vcellModelsInput.getName());
 
@@ -769,36 +811,42 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //				System.out.println("     "+key+" "+inputs.get(key));
 //			}
 		}
-		
-		private void populateVarAndTimes(final String[] cacheKeyHolder,IJVarInfos[] ijVarInfosHolder
-											/*
-											 * final VCellSelection vcellSelection, final JComboBox<String> jcbVars,
-											 * final JComboBox<String> jcbTimes, final String[] cacheKeyHolder, final
-											 * IJVarInfos[] ijVarInfosHolder
-											 */){
-			displayProgressBar(true, "Getting Vars and Times...", "VCell Model Loader", 25,uiService);
+
+		private void populateVarAndTimes(final String[] cacheKeyHolder, IJVarInfos[] ijVarInfosHolder
+		/*
+		 * final VCellSelection vcellSelection, final JComboBox<String> jcbVars, final
+		 * JComboBox<String> jcbTimes, final String[] cacheKeyHolder, final IJVarInfos[]
+		 * ijVarInfosHolder
+		 */) {
+			displayProgressBar(true, "Getting Vars and Times...", "VCell Model Loader", 25, uiService);
 			String userid = jcbUserid.getSelectedItem().toString();
-			String modelName = (jcbModelNames.getSelectedItem()==null?null:mapModelNameTimeToActualModelname.get(jcbModelNames.getSelectedItem()).toString());
-			String appName = (jcbModelNames.getSelectedItem()==null?null:jcbAppNames.getSelectedItem().toString());
-			String simName = (jcbModelNames.getSelectedItem()==null?null:jcbSimNames.getSelectedItem().toString());
-			VCellHelper.VCellModelSearch vcms = new VCellHelper.VCellModelSearch(ModelType.valueOf(jcbModelType.getSelectedItem().toString()),userid,modelName,appName,simName,null,null);
-		      try {
+			String modelName = (jcbModelNames.getSelectedItem() == null ? null
+					: mapModelNameTimeToActualModelname.get(jcbModelNames.getSelectedItem()).toString());
+			String appName = (jcbModelNames.getSelectedItem() == null ? null
+					: jcbAppNames.getSelectedItem().toString());
+			String simName = (jcbModelNames.getSelectedItem() == null ? null
+					: jcbSimNames.getSelectedItem().toString());
+			VCellHelper.VCellModelSearch vcms = new VCellHelper.VCellModelSearch(
+					ModelType.valueOf(jcbModelType.getSelectedItem().toString()), userid, modelName, appName, simName,
+					null, null);
+			try {
 //			  		jcbVars.removeAllItems();
 //			  		jcbTimes.removeAllItems();
-			  		ArrayList<VCellModelSearchResults> vcmsr = vcellHelper.getSearchedModelSimCacheKey(false,vcms,null);
-		  		if(vcmsr.size() == 0) {
-		  			throw new Exception("No Results for search found");
-		  		}
-		  		cacheKeyHolder[0] = vcmsr.get(0).getCacheKey();
-		  		System.out.println("theCacheKey="+cacheKeyHolder[0]);
+				ArrayList<VCellModelSearchResults> vcmsr = vcellHelper.getSearchedModelSimCacheKey(false, vcms, null);
+				if (vcmsr.size() == 0) {
+					throw new Exception("No Results for search found");
+				}
+				cacheKeyHolder[0] = vcmsr.get(0).getCacheKey();
+				System.out.println("theCacheKey=" + cacheKeyHolder[0]);
 				ijVarInfosHolder[0] = vcellHelper.getVarInfos(cacheKeyHolder[0]);
 
 				ijVarInfosHolder[0].getIjVarInfo().sort(new Comparator<IJVarInfo>() {
 					@Override
 					public int compare(IJVarInfo o1, IJVarInfo o2) {
 						return o1.getName().compareToIgnoreCase(o2.getName());
-					}});
-		  		
+					}
+				});
+
 //		  		SwingUtilities.invokeAndWait(new Runnable() {
 //					@Override
 //					public void run() {
@@ -844,24 +892,31 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //						}
 //						
 //					}});
-		  		
-		  		
-		  	} catch (Exception e2) {
-		  		displayProgressBar(false, "Error", "VCell Model Loader", 100,uiService);
-		  		//e.printStackTrace();
-				if(e2.getMessage().contains(".log not exist")) {
-					uiService.showDialog("VCellHelper.ModelType.bm,\""+userid+"\",\""+modelName+"\",\""+appName+"\",\""+simName+"\",null,null\n"+"Data Not Found.", "populateVarAndTimes failed", MessageType.ERROR_MESSAGE);
-				}else {
-					uiService.showDialog("VCellHelper.ModelType.bm,\""+userid+"\",\""+modelName+"\",\""+appName+"\",\""+simName+"\",null,null\n"+e2.getMessage(), "populateVarAndTimes failed", MessageType.ERROR_MESSAGE);
+
+			} catch (Exception e2) {
+				displayProgressBar(false, "Error", "VCell Model Loader", 100, uiService);
+				// e.printStackTrace();
+				if (e2.getMessage().contains(".log not exist")) {
+					uiService.showDialog(
+							"VCellHelper.ModelType.bm,\"" + userid + "\",\"" + modelName + "\",\"" + appName + "\",\""
+									+ simName + "\",null,null\n" + "Data Not Found.",
+							"populateVarAndTimes failed", MessageType.ERROR_MESSAGE);
+				} else {
+					uiService.showDialog(
+							"VCellHelper.ModelType.bm,\"" + userid + "\",\"" + modelName + "\",\"" + appName + "\",\""
+									+ simName + "\",null,null\n" + e2.getMessage(),
+							"populateVarAndTimes failed", MessageType.ERROR_MESSAGE);
 				}
-		  	}finally {
-		  		displayProgressBar(false, "Done", "VCell Model Loader", 100,uiService);
-		  	}
+			} finally {
+				displayProgressBar(false, "Done", "VCell Model Loader", 100, uiService);
+			}
 		}
+
 		private ModuleItem<VCellSelection> getvcellModelsInput(final Module module) {
 			ModuleItem<VCellSelection> result = null;
 			for (final ModuleItem<?> input : module.getInfo().inputs()) {
-				if (module.isInputResolved(input.getName())) continue;
+				if (module.isInputResolved(input.getName()))
+					continue;
 				final Class<?> type = input.getType();
 				if (!VCellSelection.class.isAssignableFrom(type)) {
 					// not a VCellSelection parameter; abort
@@ -877,8 +932,8 @@ public class VCellPlugin_Minimal extends ContextCommand {
 			}
 			return result;
 		}
-		
-		private JPanel getLabeledJComboBox(String labelName,String[] items) {
+
+		private JPanel getLabeledJComboBox(String labelName, String[] items) {
 			JPanel jp = new JPanel(new FlowLayout());
 			jp.add(new JLabel(labelName));
 			JComboBox<String> jcbModelNames = new JComboBox<String>(items);
@@ -886,8 +941,8 @@ public class VCellPlugin_Minimal extends ContextCommand {
 			return jp;
 		}
 
-	}	
-	
+	}
+
 	@Parameter
 	private UIService uiService;
 
@@ -896,69 +951,72 @@ public class VCellPlugin_Minimal extends ContextCommand {
 
 	@Parameter
 	EventService eventService;
-	
+
 	@Parameter
 	ZoomService zoomService;
-	
-  	@Parameter
-	private VCellHelper vcellHelper;
-  	
-  	@Parameter
-  	private VCellSelection vcellSelection = new VCellSelection("-1",ModelType.bm, "tutorial","Tutorial_MultiApp", "3D pde", "Simulation4",new String[] {"C_cyt"},new int[] {50});
-  	//private VCellSelection vcellSelection;
-	
 
-    /**
-     * This main function serves for development purposes.
-     * It allows you to run the plugin immediately out of
-     * your integrated development environment (IDE).
-     *
-     * @param args whatever, it's ignored
-     * @throws Exception
-     */
-    public static void main(final String... args) throws Exception {
-        // create the ImageJ application context with all available services
-        final ImageJ ij = new ImageJ();
-        ij.ui().showUI();
-    }
+	@Parameter
+	private VCellHelper vcellHelper;
+
+	@Parameter
+	private VCellSelection vcellSelection = new VCellSelection("-1", ModelType.bm, "tutorial", "Tutorial_MultiApp",
+			"3D pde", "Simulation4", new String[] { "C_cyt" }, new int[] { 50 });
+	// private VCellSelection vcellSelection;
+
+	/**
+	 * This main function serves for development purposes. It allows you to run the
+	 * plugin immediately out of your integrated development environment (IDE).
+	 *
+	 * @param args whatever, it's ignored
+	 * @throws Exception
+	 */
+	public static void main(final String... args) throws Exception {
+		// create the ImageJ application context with all available services
+		final ImageJ ij = new ImageJ();
+		ij.ui().showUI();
+	}
 
 	private static JDialog progressDialog = null;
-	private static final Dimension dim = new Dimension(200,30);
+	private static final Dimension dim = new Dimension(200, 30);
 	@SuppressWarnings("serial")
-	private static final JProgressBar jProgressBar = new JProgressBar(0,100) {
+	private static final JProgressBar jProgressBar = new JProgressBar(0, 100) {
 		@Override
 		public Dimension getPreferredSize() {
 			return dim;
 		}
+
 		@Override
 		public Dimension getSize(Dimension rv) {
 			return dim;
 		}
 	};
-	
-    private static void displayProgressBar(boolean bShow,String message,String title,int progress,UIService uiService) {
-    	if(progressDialog == null) {
-			//Frame applicationFrame = VCellPlugin.mainApplicationFrame;//IJ.getInstance();//(Frame)uiService.getDefaultUI().getApplicationFrame();
-			progressDialog = new JDialog(VCellPlugin_Minimal.mainApplicationFrame,"Checking for VCell Client",false);
+
+	private static void displayProgressBar(boolean bShow, String message, String title, int progress,
+			UIService uiService) {
+		if (progressDialog == null) {
+			// Frame applicationFrame =
+			// VCellPlugin.mainApplicationFrame;//IJ.getInstance();//(Frame)uiService.getDefaultUI().getApplicationFrame();
+			progressDialog = new JDialog(VCellPlugin_Minimal.mainApplicationFrame, "Checking for VCell Client", false);
 			progressDialog.addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent e) {
 					super.windowClosing(e);
 					progressDialog.dispose();
 					progressDialog = null;
-				}});
+				}
+			});
 			progressDialog.getContentPane().add(jProgressBar);
 			jProgressBar.setStringPainted(true);
 			jProgressBar.setString("setting up...");
 			progressDialog.pack();
-			
-    	}
-    	
-    	if(SwingUtilities.isEventDispatchThread()) {
-	    	if(progressDialog ==null) {
+
+		}
+
+		if (SwingUtilities.isEventDispatchThread()) {
+			if (progressDialog == null) {
 				return;
 			}
-			if(!bShow) {
+			if (!bShow) {
 				progressDialog.dispose();
 				progressDialog = null;
 				return;
@@ -969,15 +1027,15 @@ public class VCellPlugin_Minimal extends ContextCommand {
 			jProgressBar.setString(message);
 			jProgressBar.invalidate();
 			progressDialog.revalidate();
-			
-    	}else {
+
+		} else {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					if(progressDialog ==null) {
+					if (progressDialog == null) {
 						return;
 					}
-					if(!bShow) {
+					if (!bShow) {
 						progressDialog.dispose();
 						progressDialog = null;
 						return;
@@ -990,8 +1048,8 @@ public class VCellPlugin_Minimal extends ContextCommand {
 					progressDialog.revalidate();
 				}
 			});
-    	}
-    }
+		}
+	}
 
 //    private Hashtable<String,Thread> threadHash = new Hashtable<String,Thread>();
 //    private void startJProgressThread0(String lastName,String newName) {
@@ -1036,7 +1094,7 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //		progressThread.setDaemon(true);//So not block JVM exit
 //		progressThread.start();
 //    }
-    
+
 //    public void showAndZoom(String displayName,Object thingToDisplay,double zoomFactor) throws Exception{   	
 //    	final ImageDisplayService ids = getContext().getService(ImageDisplayService.class);
 //    	final DisplayService ds = getContext().getService(DisplayService.class);
@@ -1096,31 +1154,36 @@ public class VCellPlugin_Minimal extends ContextCommand {
 
 	@Override
 	public void run() {
-		try {			
-			if(vcellSelection != null && vcellSelection.exception != null) {
-				if(!vcellSelection.exception.getMessage().equals(MyPreProcessor.CANCELLED)) {
-					uiService.showDialog("Model search failed\n"+vcellSelection.exception.getClass().getName()+"\n"+vcellSelection.exception.getMessage(), MessageType.ERROR_MESSAGE);
+		try {
+			if (vcellSelection != null && vcellSelection.exception != null) {
+				if (!vcellSelection.exception.getMessage().equals(MyPreProcessor.CANCELLED)) {
+					uiService.showDialog("Model search failed\n" + vcellSelection.exception.getClass().getName() + "\n"
+							+ vcellSelection.exception.getMessage(), MessageType.ERROR_MESSAGE);
 				}
 				return;
 			}
-			if(vcellSelection == null || vcellSelection.theCacheKey==null) {
+			if (vcellSelection == null || vcellSelection.theCacheKey == null) {
 				return;
 			}
-			//Create ImageJ datasets and display separate hyperstack for each variable
-			for(int varIndex=0;varIndex<vcellSelection.varName.length;varIndex++) {
+			// Create ImageJ datasets and display separate hyperstack for each variable
+			for (int varIndex = 0; varIndex < vcellSelection.varName.length; varIndex++) {
 				int[] time = vcellSelection.timePointIndexes;
-				displayProgressBar(true, "loading Image...", "VCell Model Loader", (varIndex+1)*100/vcellSelection.varName.length,uiService);
-				final IJDataList tpd = vcellHelper.getTimePointData(vcellSelection.theCacheKey,vcellSelection.varName[varIndex],VCellHelper.VARTYPE_POSTPROC.NotPostProcess,time,0);
+				displayProgressBar(true, "loading Image...", "VCell Model Loader",
+						(varIndex + 1) * 100 / vcellSelection.varName.length, uiService);
+				final IJDataList tpd = vcellHelper.getTimePointData(vcellSelection.theCacheKey,
+						vcellSelection.varName[varIndex], VCellHelper.VARTYPE_POSTPROC.NotPostProcess, time, 0);
 				BasicStackDimensions bsd = tpd.ijData[0].stackInfo;
-				double[] data = new double[bsd.getTotalSize()*tpd.ijData.length];
+				double[] data = new double[bsd.getTotalSize() * tpd.ijData.length];
 				double min = Double.MAX_VALUE;
 				double max = Double.MIN_VALUE;
-				ArrayImg<DoubleType, DoubleArray> testimg = ArrayImgs.doubles( data, bsd.xsize,bsd.ysize,bsd.zsize,tpd.ijData.length);
-				for(int i=0;i<tpd.ijData.length;i++) {
-					System.arraycopy(tpd.ijData[i].getDoubleData(), 0, data, i*bsd.getTotalSize(), bsd.getTotalSize());
-					//calc minmax only for pixel values that are in domain of this variable
-					for(int j=0;j<tpd.ijData[i].getDoubleData().length;j++){
-						if(tpd.ijData[i].getDoubleData()[j] != tpd.ijData[i].notInDomainValue) {
+				ArrayImg<DoubleType, DoubleArray> testimg = ArrayImgs.doubles(data, bsd.xsize, bsd.ysize, bsd.zsize,
+						tpd.ijData.length);
+				for (int i = 0; i < tpd.ijData.length; i++) {
+					System.arraycopy(tpd.ijData[i].getDoubleData(), 0, data, i * bsd.getTotalSize(),
+							bsd.getTotalSize());
+					// calc minmax only for pixel values that are in domain of this variable
+					for (int j = 0; j < tpd.ijData[i].getDoubleData().length; j++) {
+						if (tpd.ijData[i].getDoubleData()[j] != tpd.ijData[i].notInDomainValue) {
 							min = Math.min(min, tpd.ijData[i].getDoubleData()[j]);
 							max = Math.max(max, tpd.ijData[i].getDoubleData()[j]);
 						}
@@ -1131,17 +1194,19 @@ public class VCellPlugin_Minimal extends ContextCommand {
 				imgPlus.setChannelMaximum(0, max);
 				imgPlus.setAxis(new DefaultLinearAxis(Axes.Z), 2);
 				imgPlus.setAxis(new DefaultLinearAxis(Axes.TIME), 3);
-				
-				uiService.show(vcellSelection.varName[varIndex],imgPlus);
-				DefaultImageDisplay createDisplayQuietly = (DefaultImageDisplay)displayService/* getContext().getService(DisplayService.class) */.getDisplay(vcellSelection.varName[varIndex]);
-				while(displayService.getActiveDisplay() == null) {
+
+				uiService.show(vcellSelection.varName[varIndex], imgPlus);
+				DefaultImageDisplay createDisplayQuietly = (DefaultImageDisplay) displayService
+						/* getContext().getService(DisplayService.class) */.getDisplay(
+								vcellSelection.varName[varIndex]);
+				while (displayService.getActiveDisplay() == null) {
 					Thread.sleep(100);
 				}
 				WindowManager.getActiveWindow().setSize(400, 400);
 				IJ.run("Scale to Fit", "");
-				WindowManager.getActiveWindow().setSize(400, 400);//refresh the sliders
-				
-				//final ZoomService zoomService = getContext().getService(ZoomService.class);
+				WindowManager.getActiveWindow().setSize(400, 400);// refresh the sliders
+
+				// final ZoomService zoomService = getContext().getService(ZoomService.class);
 //				zoomService.zoomSet(createDisplayQuietly, 300, 0, 0);
 //				eventService.publish(new PanZoomEvent(createDisplayQuietly.getCanvas()));
 
@@ -1150,7 +1215,7 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //				IJ.run("In");
 //				IJ.run("In");
 //				IJ.run("In");
-				
+
 //				RunService runService = getContext().getService(RunService.class);
 //				runService.run("In", (Map)null);
 //				final Iterator<PluginInfo<Op>> iterator = opService.getPlugins().iterator();
@@ -1161,44 +1226,49 @@ public class VCellPlugin_Minimal extends ContextCommand {
 //				final ZoomService zoomService = getContext().getService(ZoomService.class);
 //				zoomService.zoomSet(createDisplayQuietly, 300, 0, 0);	
 //				createDisplayQuietly.update();
-				
-				//final Display<?> createDisplayQuietly = getContext().getService(DisplayService.class).createDisplayQuietly(testimg);
-				final DefaultDatasetView defaultDatasetView = (DefaultDatasetView)((DefaultImageDisplay)createDisplayQuietly).getActiveView();
+
+				// final Display<?> createDisplayQuietly =
+				// getContext().getService(DisplayService.class).createDisplayQuietly(testimg);
+				final DefaultDatasetView defaultDatasetView = (DefaultDatasetView) ((DefaultImageDisplay) createDisplayQuietly)
+						.getActiveView();
 //				defaultDatasetView.getData().setAxis(createDisplayQuietly.axis(2), 2);
 //				defaultDatasetView.getData().setAxis(createDisplayQuietly.axis(3), 3);
 //				defaultDatasetView.update();
-				System.out.println(min+" "+max);
+				System.out.println(min + " " + max);
 //				displayService.setActiveDisplay(createDisplayQuietly);
 //				IJ.setMinAndMax(min, max);
 //				defaultDatasetView.getData().setChannelMinimum(0, min);
 //				defaultDatasetView.getData().setChannelMaximum(0, max);
-				
+
 //				defaultDatasetView.setChannelRanges(min,max);
-				
-				//IJ.getImage().updateAndDraw();
+
+				// IJ.getImage().updateAndDraw();
 //				while(displayService.getActiveDisplay() == null) {
 //					Thread.sleep(100);
 //				}
 //				IJ.setMinAndMax(min, max);
-				//WindowManager.getCurrentImage().setDisplayRange(min, max)
-				
-				//WindowManager.getCurrentImage().setDisplayRange(min,max);
-				//ImageStack.create(varIndex, varIndex, varIndex, varIndex)
-				//ImagePlus ip = new ImagePlus();
+				// WindowManager.getCurrentImage().setDisplayRange(min, max)
 
-				//uiService.showUI();
+				// WindowManager.getCurrentImage().setDisplayRange(min,max);
+				// ImageStack.create(varIndex, varIndex, varIndex, varIndex)
+				// ImagePlus ip = new ImagePlus();
+
+				// uiService.showUI();
 //				EventService es = null;
-				//getContext().getService(EventService.class).publish(new DisplayUpdatedEvent(createDisplayQuietly,DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
-				//uiService.get
+				// getContext().getService(EventService.class).publish(new
+				// DisplayUpdatedEvent(createDisplayQuietly,DisplayUpdatedEvent.DisplayUpdateLevel.UPDATE));
+				// uiService.get
 //				uiService.show(createDisplayQuietly);
 //				getContext().getService(DisplayService.class).
 //				showAndZoom(vcellSelection.varName[varIndex],createDisplayQuietly, 3);
 			}
 		} catch (Exception e) {
-			displayProgressBar(false, "Error", "VCell Model Loader", 100,uiService);
-			uiService.showDialog("theCacheKey,var,VCellHelper.VARTYPE_POSTPROC.NotPostProcess,time,0\n"+e.getMessage(), "getTimePoint(...) failed", MessageType.ERROR_MESSAGE);
-		}finally {
-			displayProgressBar(false, "displaying Image...", "VCell Model Loader", 100,uiService);
+			displayProgressBar(false, "Error", "VCell Model Loader", 100, uiService);
+			uiService.showDialog(
+					"theCacheKey,var,VCellHelper.VARTYPE_POSTPROC.NotPostProcess,time,0\n" + e.getMessage(),
+					"getTimePoint(...) failed", MessageType.ERROR_MESSAGE);
+		} finally {
+			displayProgressBar(false, "displaying Image...", "VCell Model Loader", 100, uiService);
 		}
 	}
 }
