@@ -70,6 +70,14 @@
 				<role>maintainer</role>
 			</roles>
 		</developer>
+		<developer>
+			<id>paulricky</id>
+			<name>Rick Paul</name>
+			<roles>
+				<role>developer</role>
+				<role>debugger</role>
+			</roles>
+		</developer>
 	</developers>
 	<contributors>
 		<contributor>
