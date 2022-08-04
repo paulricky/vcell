@@ -54,7 +54,7 @@ public class Help extends ContextCommand{
 	private VCellHelper vcellHelper;
   	static  JOptionPane e = new JOptionPane();
 
-  	JFrame frame = new JFrame();
+  	JFrame ui = new JFrame();
 	public static void main(String[] args) {
         // create the ImageJ application context with all available services
         final ImageJ ij = new ImageJ();
@@ -65,8 +65,8 @@ public class Help extends ContextCommand{
 
 	@Override
 	public void run() {
-		frame.setSize(new Dimension(1500,1000));
-		frame.setLayout(new GridBagLayout());
+		ui.setSize(new Dimension(1500,1000));
+		ui.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
 		String string1 = ("The Start ImageJ VCell Service allows the image analysis program Fiji to communicate with VCell. Fiji can then query and transfer simulation data from VCell to Fiji. In VCell select Start Fiji (ImageJ) Service from the Tools menu");
@@ -78,7 +78,7 @@ public class Help extends ContextCommand{
 	  	label1.setText("<html>"+ string1 +"</html>");
 	  	c.gridx = 0;
 	  	c.gridy = 0;
-	  	frame.add(label1,c);
+	  	ui.add(label1,c);
 		c.gridx = 0;
 	  	c.gridy = 1;
 	  	Image imageRow;
@@ -87,7 +87,7 @@ public class Help extends ContextCommand{
 		    URL url = new URL("https://i.imgur.com/QEUyTH3.png");
 		    imageRow = (ImageIO.read(url)).getScaledInstance((int)((ImageIO.read(url).getWidth())*scaleFactor), (int)((ImageIO.read(url).getHeight())*scaleFactor), Image.SCALE_DEFAULT);
 		    JLabel picLabel = new JLabel(new ImageIcon(imageRow));
-		    frame.add(picLabel,c);
+		    ui.add(picLabel,c);
 		} catch (Exception exp) {
 		    exp.printStackTrace();
 		} 
@@ -95,7 +95,7 @@ public class Help extends ContextCommand{
 	  	c.gridy = 2;
 	  	JLabel label2 = new JLabel();
 	  	label2.setText("<html>"+ string2 +"</html>");
-	  	frame.add(label2,c);
+	  	ui.add(label2,c);
 		c.gridx = 0;
 	  	c.gridy = 3;
 	  	c.fill = GridBagConstraints.NONE;
@@ -106,7 +106,7 @@ public class Help extends ContextCommand{
 		    image2 = (ImageIO.read(url)).getScaledInstance((int)((ImageIO.read(url).getWidth())*scaleFactor), (int)((ImageIO.read(url).getHeight())*scaleFactor), Image.SCALE_DEFAULT);
 		    JLabel picLabel = new JLabel(new ImageIcon(image2));
 		    picLabel.setMaximumSize(new Dimension(100,100));
-		    frame.add(picLabel,c);
+		    ui.add(picLabel,c);
 		} catch (Exception exp) {
 		    exp.printStackTrace();
 		} 
@@ -115,9 +115,9 @@ public class Help extends ContextCommand{
 	  	c.gridy = 4;
 		JLabel label3 = new JLabel();
 	  	label3.setText("<html>"+ string3 +"</html>");
-		frame.add(label3,c);
+		ui.add(label3,c);
 		//a.setPreferredSize(new Dimension(500,500));
-	  	frame.setVisible(true);
+	  	ui.setVisible(true);
 		/*e.add(a);
 		a.setSize(new Dimension(500,500));
 		e.setVisible(true); */

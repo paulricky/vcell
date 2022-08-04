@@ -748,7 +748,7 @@ public class VCellPlugin extends ContextCommand {
 										dataVars[i][2] = ijVarInfosHolder[0].getIjVarInfo().get(i).getVariableType();
 										counter1--;
 									  } // else {
-									//	i = i-counter1;
+									 //	i = i-counter1;
 									 // }
 										
 									}

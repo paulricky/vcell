@@ -58,7 +58,7 @@ public class GroovyScripts extends ContextCommand{
 
   	@Parameter
 	private VCellHelper vcellHelper;
-  	static JFrame frame = new JFrame();
+  	static JFrame ui = new JFrame();
   
 	String chartText = "#@VCellHelper vh\n"
 			+ "//(See https://github.com/virtualcell/vcell/tree/master/vcell-imagej-helper/src/main/java/org/vcell/imagej/helper/VCellHelper.java)\n"
@@ -306,8 +306,6 @@ public class GroovyScripts extends ContextCommand{
         ij.ui().showUI();
      }
 
-
-	
 	public static void scriptButton(String name, JFrame frame, String text, GridBagConstraints constraints) {
 		final JButton button = new JButton(name);
 		frame.add(button, constraints);		
@@ -329,30 +327,38 @@ public class GroovyScripts extends ContextCommand{
 				dialog.setVisible(true);
 	     		e.setSize(500,200);            
 	    	    e.setVisible(true);
-	    		 
 	         }
 	      };
 	      button.addActionListener(buttonAction);	
-		
-			
 	 }  
 	
 	
 	@Override
 	public void run() {
-		
-		frame.setSize(new Dimension(1000,800));
-		frame.setLayout(new GridBagLayout());
+		ui.setSize(new Dimension(1000,800));
+		ui.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
-		Image image;
+		c.gridwidth = 1;
+		Image groovyLogo;
 		try {
-			double scaleFactor = 0.5;
+			double scaleFactor = 0.45;
 		    URL url = new URL("https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Groovy-logo.svg/1200px-Groovy-logo.svg.png");
-		    image = (ImageIO.read(url)).getScaledInstance((int)((ImageIO.read(url).getWidth())*scaleFactor), (int)((ImageIO.read(url).getHeight())*scaleFactor), Image.SCALE_DEFAULT);
-		    JLabel picLabel = new JLabel(new ImageIcon(image));
-		    frame.add(picLabel,c);
+		    groovyLogo = (ImageIO.read(url)).getScaledInstance((int)((ImageIO.read(url).getWidth())*scaleFactor), (int)((ImageIO.read(url).getHeight())*scaleFactor), Image.SCALE_DEFAULT);
+		    JLabel picLabel = new JLabel(new ImageIcon(groovyLogo));
+		    ui.add(picLabel,c);
+		} catch (Exception exp) {
+		    exp.printStackTrace();
+		} 
+		c.gridx = 1;
+		Image vcellLogo;
+		try {
+			double scaleFactor = 3;
+		    URL url = new URL("https://i.imgur.com/mhxoPJD.png");
+		    vcellLogo = (ImageIO.read(url)).getScaledInstance((int)((ImageIO.read(url).getWidth())*scaleFactor), (int)((ImageIO.read(url).getHeight())*scaleFactor), Image.SCALE_DEFAULT);
+		    JLabel picLabel = new JLabel(new ImageIcon(vcellLogo));
+		    ui.add(picLabel,c);
 		} catch (Exception exp) {
 		    exp.printStackTrace();
 		} 
@@ -361,35 +367,54 @@ public class GroovyScripts extends ContextCommand{
 		c.gridx = 0;
 		c.gridy = 1;
 		JEditorPane pane1 = new JEditorPane();
-		 pane1.setBackground(frame.getBackground());
+		 pane1.setBackground(ui.getBackground());
 	     pane1.setContentType("text/html");
 	     pane1.setText("<html>"+ pane1.getText() +"</html>");
 	     pane1.setText("VCell infrastructure provides a way to run macros in order to communicate with VCell. Below are available macros written in <a href=\"https://groovy-lang.org/​\">Groovy</a> scripting language. To run them,  Fiji -> Plugins -> Macros -> Startup Macros ... Choose Grovy language and copy-paste the Macros into the text area. You may need to change some lines (see comments).\n"
 	     		+ "<li> \n Macros to retrieve 2D sim results image into Fiji \n");
+	     pane1.addHyperlinkListener(new HyperlinkListener() {
+		    	public void hyperlinkUpdate(HyperlinkEvent e) {
+		    		 if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+		    			 try {
+		    				 URI url = null;
+		    					try {
+		    						url = new URI("https://groovy-lang.org");
+		    					} catch (URISyntaxException e1) {
+		    						// TODO Auto-generated catch block
+		    						e1.printStackTrace();
+		    					}
+							Desktop.getDesktop().browse(url);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+			         }
+		    	}
+		    });
 	     JEditorPane pane2 = new JEditorPane();
-		 pane2.setBackground(frame.getBackground());
+		 pane2.setBackground(ui.getBackground());
 	     pane2.setContentType("text/html");
 	     pane2.setText("<html>"+ pane2.getText() +"</html>");
 	     pane2.setText("Macros to ...\n"
 	     		+ "\n");
 	     JEditorPane pane3 = new JEditorPane();
-		 pane3.setBackground(frame.getBackground());
+		 pane3.setBackground(ui.getBackground());
 	     pane3.setContentType("text/html");
 	     pane3.setText("<html>"+ pane3.getText() +"</html>");
 	     pane3.setText("</ul>\n"
 	     		+ "\n"
 	     		+ "Please email <a mailto:blinov@uchc.edu>Michael Blinov</a> for questions.");
 	     pane1.setEditable(false);
-	     frame.add(pane1,c);
+	     ui.add(pane1,c);
 	     c.gridy = 2;
-		scriptButton("Chart", frame, chartText, c);
+		scriptButton("Chart", ui, chartText, c);
 		c.gridy = 3;
-		frame.add(pane2,c);
+		ui.add(pane2,c);
 		c.gridy = 4;
-		scriptButton("CombineFig", frame, combineFigText, c);
+		scriptButton("CombineFig", ui, combineFigText, c);
 		c.gridy = 5;
-		frame.add(pane3,c);
-		frame.setVisible(true);
-		frame.setResizable(false);
+		ui.add(pane3,c);
+		ui.setVisible(true);
+		ui.setResizable(false);
 	}
 }
